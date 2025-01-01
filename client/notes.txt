@@ -1,0 +1,5 @@
+https://gltf.report/
+
+use above if glb extension does have some components
+I downloaded the 3D model then when loaded in threejs cannot since missing textures
+thus convert it using above and export
