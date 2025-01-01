@@ -1,10 +1,47 @@
-import React, { useRef } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import { useGLTF } from '@react-three/drei'
-import * as THREE from 'three'
+import { useControls } from 'leva'
 
-const Eye = ({ clippingPlanes = [] }) => {
+const Eye = () => {
   const group = useRef()
-  const { nodes, materials } = useGLTF('/3d-vh-f-eye-r.glb')
+  const { nodes, materials, scene } = useGLTF('/anatomy_of_the_eye-v1.glb')
+  const [nodeList, setNodeList] = useState([])
+
+  // Debug GUI controls
+  const { position, rotation, scale } = useControls({
+    position: { value: { x: 0, y: 0, z: 0 }, step: 0.1 },
+    rotation: { value: { x: 0, y: 0, z: 0 }, step: 0.1 },
+    scale: { value: { x: 1, y: 1, z: 1 }, step: 0.1 }
+  })
+
+  // Material visibility controls
+  const materialControls = useControls(
+    'Materials',
+    Object.fromEntries(
+      Object.entries(materials || {}).map(([name]) => [
+        name,
+        { value: true }
+      ])
+    )
+  )
+
+  useEffect(() => {
+    if (nodes) {
+      console.log('Loaded Nodes:', nodes)
+      console.log('Materials:', materials)
+      
+      const meshNodes = Object.entries(nodes)
+        .filter(([_, node]) => node.geometry && node.material)
+        .map(([name]) => name)
+      
+      setNodeList(meshNodes)
+      console.table(meshNodes.map(name => ({
+        name,
+        material: nodes[name].material.name,
+        vertices: nodes[name].geometry.attributes.position.count
+      })))
+    }
+  }, [nodes, materials])
 
   const createEyeMeshes = () => {
     if (!nodes) return null
@@ -12,36 +49,16 @@ const Eye = ({ clippingPlanes = [] }) => {
     return Object.entries(nodes).map(([name, node]) => {
       if (!node.geometry || !node.material) return null
       
-      // Clone the original material
       const material = node.material.clone()
-
-      // Preserve original properties
-      Object.keys(node.material).forEach(prop => {
-        if (prop !== 'uuid' && prop !== 'id' && !prop.startsWith('_')) {
-          material[prop] = node.material[prop]
-        }
-      })
-
-      // Enable clipping for the material
-      material.clippingPlanes = clippingPlanes
-      material.clipIntersection = false
-      material.clipShadows = true
-      material.needsUpdate = true
-      
-      // Show both sides of the geometry when clipped
-      material.side = THREE.DoubleSide
+      material.transparent = true
+      material.opacity = materialControls[name] ? 1 : 0
 
       return (
         <mesh
           key={name}
-          name={name}
           geometry={node.geometry}
           material={material}
-          position={node.position || [0, 0, 0]}
-          rotation={node.rotation || [0, 0, 0]}
-          scale={node.scale || [1, 1, 1]}
-          castShadow
-          receiveShadow
+          visible={materialControls[name]}
         />
       )
     }).filter(Boolean)
@@ -49,15 +66,14 @@ const Eye = ({ clippingPlanes = [] }) => {
 
   return (
     <group 
-      ref={group} 
-      scale={[2, 2, 2]}
-      position={[0.12, 0.02, 0]}
+      ref={group}
+      position={[position.x, position.y, position.z]}
+      rotation={[rotation.x, rotation.y, rotation.z]}
+      scale={[scale.x, scale.y, scale.z]}
     >
       {createEyeMeshes()}
     </group>
   )
 }
-
-useGLTF.preload('/3d-vh-f-eye-r.glb')
 
 export default Eye
