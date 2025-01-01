@@ -1,22 +1,55 @@
-import React, { Suspense } from 'react'
-import { Canvas } from '@react-three/fiber'
-import { OrbitControls, Environment } from '@react-three/drei'
+import React, { Suspense, useState, useCallback } from 'react'
+import { Canvas, useThree, useFrame } from '@react-three/fiber'
+import { OrbitControls, Stage } from '@react-three/drei'
+import * as THREE from 'three'
 import Eye from './Eye'
 
-const Fallback = () => (
-  <mesh>
-    <sphereGeometry args={[2, 32, 32]} />
-    <meshStandardMaterial color="red" />
-  </mesh>
-)
+const Scene = ({ clippingDistance }) => {
+  const { gl } = useThree()
+  
+  // Enable clipping in the renderer
+  React.useEffect(() => {
+    gl.localClippingEnabled = true
+  }, [gl])
+
+  // Create clipping plane
+  const clippingPlane = new THREE.Plane(new THREE.Vector3(1, 0, 0), clippingDistance)
+
+  return (
+    <Stage
+      environment="studio"
+      intensity={1}
+      preset="rembrandt"
+      adjustCamera={false}
+    >
+      <Eye clippingPlanes={[clippingPlane]} />
+    </Stage>
+  )
+}
 
 const EyeCanvas = () => {
+  const [clippingDistance, setClippingDistance] = useState(0)
+
+  const handleCameraChange = useCallback((e) => {
+    const distance = e.target.getDistance();
+
+    // No clipping when zoomed out (distance >= 3)
+    if (distance >= 2) {
+      setClippingDistance(0);
+    } else {
+      // Start clipping as you zoom in (distance < 3)
+      const clipAmount = ((3 - distance) / 2.5) * 1; // Map [3, 0.5] to [0, 2]
+      setClippingDistance(clipAmount);
+    }
+  }, []);
+
+
   return (
     <Canvas
       shadows
       camera={{ 
-        position: [8, 0, 0],
-        fov: 2.5,
+        position: [-4, 4, 4],
+        fov: 1.2,
         near: 0.1,
         far: 1000
       }}
@@ -26,27 +59,19 @@ const EyeCanvas = () => {
         background: '#151515'
       }}
     >
-      <ambientLight intensity={0.6} />
-      <pointLight position={[10, 10, 10]} intensity={1.5} castShadow />
-      <pointLight position={[-10, -10, -10]} intensity={0.8} />
-      <directionalLight 
-        position={[5, 5, 5]} 
-        intensity={1} 
-        castShadow
-      />
-      
-      <Environment preset="studio" intensity={0.8} />
-
-      <Suspense fallback={<Fallback />}>
-        <Eye />
+      <Suspense fallback={null}>
+        <Scene clippingDistance={clippingDistance} />
       </Suspense>
 
       <OrbitControls 
         enableZoom={true}
         maxDistance={10}
-        minDistance={5}
-        target={[0, 1.5, 0]}
+        minDistance={0.5}
+        target={[0, 0, 0]}
         makeDefault
+        onChange={handleCameraChange}
+        enableDamping={true}
+        dampingFactor={0.05}
       />
     </Canvas>
   )
