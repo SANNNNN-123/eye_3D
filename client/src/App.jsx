@@ -1,6 +1,7 @@
 // App.jsx
 import React from 'react'
 import EyeCanvas from './components/EyeCanvas'
+import ModelViewer from './components/ModelViewer';
 
 function App() {
   return (
@@ -8,7 +9,7 @@ function App() {
       <div className="w-full h-full flex flex-col">
         <h1 className="text-3xl font-bold text-white p-4 text-center">3D Eye Model</h1>
         <div className="flex-1">
-          <EyeCanvas />
+          <EyeCanvas/>
         </div>
       </div>
     </div>
