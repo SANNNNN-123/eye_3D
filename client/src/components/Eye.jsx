@@ -1,152 +1,192 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useGLTF } from '@react-three/drei';
-import { useControls, folder } from 'leva';
-import { Html } from '@react-three/drei';
+import { useThree, useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 
-// Annotation Bubble Component
-const AnnotationBubble = ({ number, name, position }) => {
-  const [hovered, setHovered] = useState(false);
+// Define annotation interface
+const annotations = {
+  retina: {
+    title: "Retina",
+    number : 1,
+    description: "Light-sensitive layer at the back of the eye",
+    position: new THREE.Vector3(-0.5, 2, 2.7),
+    lookAt: new THREE.Vector3(3, 18, -150)
+  },
+  cornea: {
+    title: "Cornea",
+    description: "Clear front layer of the eye",
+    position: new THREE.Vector3(1.64, 2.7, 3.6),
+    lookAt: new THREE.Vector3(3, 18, -150)
+  },
+  lens: {
+    title: "Lens",
+    description: "Focuses light onto the retina",
+    position: new THREE.Vector3(1, 2.4, 3.2),
+    lookAt: new THREE.Vector3(3, 18, -150)
+  }
+};
 
-  return (
-    <Html position={position} occlude>
-      <div 
-        className="relative"
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-      >
-        {/* Bubble */}
-        <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center cursor-pointer transform transition-transform hover:scale-110">
-          <span className="text-white text-sm font-bold">{number}</span>
+// Annotation Marker Component
+const AnnotationMarker = ({ annotation, onClick }) => {
+  const markerRef = useRef();
+  
+  useEffect(() => {
+    if (markerRef.current) {
+      // Create label element
+      const labelDiv = document.createElement('div');
+      labelDiv.className = 'annotation-label';
+      labelDiv.innerHTML = `
+        <div class="marker">
+          <div class="pin"></div>
+          <div class="pulse"></div>
         </div>
-        
-        {/* Tooltip */}
-        {hovered && (
-          <div className="absolute left-8 top-0 bg-gray-900 text-white px-2 py-1 rounded text-sm whitespace-nowrap">
-            {name}
-          </div>
-        )}
-      </div>
-    </Html>
-  );
+        <div class="content">
+          <h3>${annotation.title}</h3>
+          <p>${annotation.description}</p>
+        </div>
+      `;
+      
+      // Create CSS2D object
+      const label = new CSS2DObject(labelDiv);
+      label.position.copy(annotation.position);
+      markerRef.current.add(label);
+
+      // Add click handler
+      labelDiv.addEventListener('click', () => onClick(annotation));
+      
+      return () => {
+        markerRef.current.remove(label);
+        labelDiv.remove();
+      };
+    }
+  }, [annotation, onClick]);
+
+  return <group ref={markerRef} />;
 };
 
 export function Eye() {
   const groupRef = useRef();
-  const { nodes, materials, scene } = useGLTF('/anatomy_of_the_eye-v1.glb');
-  const [annotations, setAnnotations] = useState([]);
-
-  // Model controls
-  const modelControls = useControls({
-    Transform: folder({
-      position: { 
-        value: { x: 3, y: 18, z: -150 }, 
-        step: 0.1,
-        render: () => false // Hide from GUI since we want fixed values
-      },
-      rotation: { 
-        value: { x: 0, y: 0, z: 0 }, 
-        step: 0.1 
-      },
-      scale: { 
-        value: 0.1, 
-        min: 0.1, 
-        max: 10, 
-        step: 0.1,
-        render: () => false // Hide from GUI since we want fixed values
-      }
-    })
-  });
-
-  // Light controls
-  const lightControls = useControls({
-    Lighting: folder({
-      ambientIntensity: { value: 0.8, min: 0, max: 2, step: 0.1 },
-      directionalIntensity: { value: 1, min: 0, max: 2, step: 0.1 },
-      directionalPosition: { 
-        value: { x: 10, y: 11, z: 7 },
-        step: 0.1
-      }
-    })
-  });
-
-  // Generate annotations from nodes
-  useEffect(() => {
-    if (nodes) {
-      console.log('Available nodes:', nodes);
-      const nodeAnnotations = Object.entries(nodes)
-        .filter(([name, node]) => {
-          const hasGeometryAndMaterial = node.geometry && node.material;
-          console.log(`Node ${name}:`, {
-            hasGeometry: !!node.geometry,
-            hasMaterial: !!node.material,
-            position: node.position,
-            willBeAnnotated: hasGeometryAndMaterial
-          });
-          return hasGeometryAndMaterial;
-        })
-        .map(([name, node], index) => {
-          const annotation = {
-            id: index + 1,
-            name: name,
-            position: [
-              (node.position?.x || 0) * modelControls.scale,
-              (node.position?.y || 0) * modelControls.scale,
-              (node.position?.z || 0) * modelControls.scale
-            ]
-          };
-          console.log(`Created annotation for ${name}:`, annotation);
-          return annotation;
-        });
+  const { scene, camera, gl } = useThree();
+  const { scene: modelScene } = useGLTF('/anatomy_of_the_eye-v1.glb');
+  const [labelRenderer, setLabelRenderer] = useState(null);
   
-      console.log('Final annotations:', nodeAnnotations);
-      setAnnotations(nodeAnnotations);
+  // Initialize CSS2DRenderer
+  useEffect(() => {
+    const renderer = new CSS2DRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.domElement.style.position = 'absolute';
+    renderer.domElement.style.top = '0px';
+    renderer.domElement.style.pointerEvents = 'none';
+    document.body.appendChild(renderer.domElement);
+    setLabelRenderer(renderer);
+
+    // Add styles
+    const style = document.createElement('style');
+    style.textContent = `
+      .annotation-label {
+        pointer-events: auto;
+        cursor: pointer;
+      }
+      .marker {
+        position: relative;
+        width: 24px;
+        height: 24px;
+      }
+      .pin {
+        width: 12px;
+        height: 12px;
+        background: #4a90e2;
+        border: 2px solid white;
+        border-radius: 50%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      .pulse {
+        width: 24px;
+        height: 24px;
+        background: rgba(74, 144, 226, 0.3);
+        border-radius: 50%;
+        position: absolute;
+        animation: pulse 2s infinite;
+      }
+      .content {
+        display: none;
+        position: absolute;
+        left: 30px;
+        top: -10px;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 4px;
+        width: max-content;
+        max-width: 200px;
+      }
+      .annotation-label:hover .content {
+        display: block;
+      }
+      @keyframes pulse {
+        0% { transform: scale(1); opacity: 0.3; }
+        70% { transform: scale(2); opacity: 0; }
+        100% { transform: scale(1); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+
+    return () => {
+      document.body.removeChild(renderer.domElement);
+      document.head.removeChild(style);
+    };
+  }, []);
+
+  // Handle annotation click
+  const handleAnnotationClick = (annotation) => {
+    // Animate camera to look at annotation
+    const targetPosition = annotation.lookAt.clone();
+    const startPosition = camera.position.clone();
+    const duration = 1000;
+    const startTime = Date.now();
+
+    const animate = () => {
+      const now = Date.now();
+      const progress = Math.min((now - startTime) / duration, 1);
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+      
+      camera.position.lerpVectors(startPosition, targetPosition, progress);
+      camera.lookAt(annotation.lookAt);
+    };
+
+    animate();
+  };
+
+  // Render labels
+  useFrame(() => {
+    if (labelRenderer) {
+      labelRenderer.render(scene, camera);
     }
-  }, [nodes, modelControls.scale]);
+  });
 
   return (
-    <>
-      {/* Lights */}
-      <ambientLight intensity={lightControls.ambientIntensity} />
-      <directionalLight 
-        intensity={lightControls.directionalIntensity}
-        position={[
-          lightControls.directionalPosition.x,
-          lightControls.directionalPosition.y,
-          lightControls.directionalPosition.z
-        ]}
-        castShadow
-      />
-
-      {/* Model */}
+    <group ref={groupRef}>
       <primitive 
-        ref={groupRef}
-        object={scene} 
-        position={[
-          modelControls.position.x,
-          modelControls.position.y,
-          modelControls.position.z
-        ]}
-        rotation={[
-          modelControls.rotation.x,
-          modelControls.rotation.y,
-          modelControls.rotation.z
-        ]}
-        scale={modelControls.scale}
+        object={modelScene} 
+        position={[3, 18, -150]}
+        scale={0.1}
       />
-
-      {/* Annotations */}
-      {annotations.map((annotation) => {
-      console.log(`Rendering annotation ${annotation.id}:`, annotation);
-      return (
-        <AnnotationBubble
-          key={annotation.id}
-          number={annotation.id}
-          name={annotation.name}
-          position={annotation.position}
+      
+      {Object.entries(annotations).map(([key, annotation]) => (
+        <AnnotationMarker
+          key={key}
+          annotation={annotation}
+          onClick={handleAnnotationClick}
         />
-      );
-    })}
-    </>
+      ))}
+    </group>
   );
 }
 

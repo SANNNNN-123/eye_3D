@@ -22,3 +22,13 @@ body,
 canvas {
   touch-action: none;
 }
+
+
+.annotation {
+  pointer-events: none;
+  transition: opacity 0.5s;
+}
+
+.annotation > div {
+  transform-origin: left top;
+}
