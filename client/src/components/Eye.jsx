@@ -10,8 +10,8 @@ const annotations = {
     title: "Retina",
     number : 1,
     description: "Light-sensitive layer at the back of the eye",
-    position: new THREE.Vector3(-0.5, 2, 2.7),
-    lookAt: new THREE.Vector3(3, 18, -150)
+    position: new THREE.Vector3(-0.36, 2, 2.7),
+    lookAt: new THREE.Vector3(-1, 4, 6)
   },
   cornea: {
     title: "Cornea",
@@ -23,7 +23,7 @@ const annotations = {
     title: "Lens",
     description: "Focuses light onto the retina",
     position: new THREE.Vector3(1, 2.4, 3.2),
-    lookAt: new THREE.Vector3(3, 18, -150)
+    lookAt: new THREE.Vector3(-1.5, 4, 5)
   }
 };
 
