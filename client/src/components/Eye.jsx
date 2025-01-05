@@ -8,22 +8,45 @@ import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer
 const annotations = {
   retina: {
     title: "Retina",
-    number : 1,
+    number : 6,
     description: "Light-sensitive layer at the back of the eye",
     position: new THREE.Vector3(-0.36, 2, 2.7),
     lookAt: new THREE.Vector3(-1, 4, 6)
   },
   cornea: {
     title: "Cornea",
+    number : 1,
     description: "Clear front layer of the eye",
     position: new THREE.Vector3(1.64, 2.7, 3.6),
-    lookAt: new THREE.Vector3(3, 18, -150)
+    lookAt: new THREE.Vector3(-1.5, 5, 9)
   },
   lens: {
     title: "Lens",
+    number : 3,
     description: "Focuses light onto the retina",
     position: new THREE.Vector3(1, 2.4, 3.2),
     lookAt: new THREE.Vector3(-1.5, 4, 5)
+  },
+  conjuctiva: {
+    title: "Conjuctiva",
+    number : 4,
+    description: "Do something",
+    position: new THREE.Vector3(1.5, 1.7, 3.5),
+    lookAt: new THREE.Vector3(-1.5, 4, 5)
+  },
+  sclera: {
+    title: "Sclera",
+    number : 5,
+    description: "Do something",
+    position: new THREE.Vector3(1, 3.50, 2.8),
+    lookAt: new THREE.Vector3(-1.5, 4, 5)
+  },
+  choroid: {
+    title: "Choroid",
+    number : 6,
+    description: "Light-sensitive layer at the back of the eye",
+    position: new THREE.Vector3(-0.36, 2, 2.7),
+    lookAt: new THREE.Vector3(-1, 4, 6)
   }
 };
 
@@ -37,15 +60,17 @@ const AnnotationMarker = ({ annotation, onClick }) => {
       const labelDiv = document.createElement('div');
       labelDiv.className = 'annotation-label';
       labelDiv.innerHTML = `
-        <div class="marker">
-          <div class="pin"></div>
-          <div class="pulse"></div>
+      <div class="marker">
+        <div class="pin">
+          <span class="number">${annotation.number || ''}</span>
         </div>
-        <div class="content">
-          <h3>${annotation.title}</h3>
-          <p>${annotation.description}</p>
-        </div>
-      `;
+        <div class="pulse"></div>
+      </div>
+      <div class="content">
+        <h3>${annotation.title}</h3>
+        <p>${annotation.description}</p>
+      </div>
+    `;
       
       // Create CSS2D object
       const label = new CSS2DObject(labelDiv);
@@ -71,7 +96,6 @@ export function Eye() {
   const { scene: modelScene } = useGLTF('/anatomy_of_the_eye-v1.glb');
   const [labelRenderer, setLabelRenderer] = useState(null);
   
-  // Initialize CSS2DRenderer
   useEffect(() => {
     const renderer = new CSS2DRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -80,64 +104,9 @@ export function Eye() {
     renderer.domElement.style.pointerEvents = 'none';
     document.body.appendChild(renderer.domElement);
     setLabelRenderer(renderer);
-
-    // Add styles
-    const style = document.createElement('style');
-    style.textContent = `
-      .annotation-label {
-        pointer-events: auto;
-        cursor: pointer;
-      }
-      .marker {
-        position: relative;
-        width: 24px;
-        height: 24px;
-      }
-      .pin {
-        width: 12px;
-        height: 12px;
-        background: #4a90e2;
-        border: 2px solid white;
-        border-radius: 50%;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-      }
-      .pulse {
-        width: 24px;
-        height: 24px;
-        background: rgba(74, 144, 226, 0.3);
-        border-radius: 50%;
-        position: absolute;
-        animation: pulse 2s infinite;
-      }
-      .content {
-        display: none;
-        position: absolute;
-        left: 30px;
-        top: -10px;
-        background: rgba(0, 0, 0, 0.8);
-        color: white;
-        padding: 8px 12px;
-        border-radius: 4px;
-        width: max-content;
-        max-width: 200px;
-      }
-      .annotation-label:hover .content {
-        display: block;
-      }
-      @keyframes pulse {
-        0% { transform: scale(1); opacity: 0.3; }
-        70% { transform: scale(2); opacity: 0; }
-        100% { transform: scale(1); opacity: 0; }
-      }
-    `;
-    document.head.appendChild(style);
-
+  
     return () => {
       document.body.removeChild(renderer.domElement);
-      document.head.removeChild(style);
     };
   }, []);
 
