@@ -43,41 +43,54 @@ const annotations = {
   },
   choroid: {
     title: "Choroid",
-    number : 6,
+    number : 7,
     description: "Light-sensitive layer at the back of the eye",
-    position: new THREE.Vector3(-0.36, 2, 2.7),
+    position: new THREE.Vector3(-0.45, 2.87, 2.4),
+    lookAt: new THREE.Vector3(-2, 5, 5)
+  },
+  iris: {
+    title: "Iris",
+    number : 8,
+    description: "Do something",
+    position: new THREE.Vector3(1.43, 2.6, 3.3),
+    lookAt: new THREE.Vector3(-1.5, 4, 5)
+  },
+  opticnerve: {
+    title: "Optic Nerve",
+    number : 9,
+    description: "Do something",
+    position: new THREE.Vector3(-0.66, 2.2, 1.6),
     lookAt: new THREE.Vector3(-1, 4, 6)
   }
 };
 
 // Annotation Marker Component
-const AnnotationMarker = ({ annotation, onClick }) => {
+const AnnotationMarker = ({ annotation, onClick, camera }) => {
   const markerRef = useRef();
+  const labelRef = useRef();
   
   useEffect(() => {
     if (markerRef.current) {
-      // Create label element
       const labelDiv = document.createElement('div');
       labelDiv.className = 'annotation-label';
       labelDiv.innerHTML = `
-      <div class="marker">
-        <div class="pin">
-          <span class="number">${annotation.number || ''}</span>
+        <div class="marker">
+          <div class="pin">
+            <span class="number">${annotation.number || ''}</span>
+          </div>
+          <div class="pulse"></div>
         </div>
-        <div class="pulse"></div>
-      </div>
-      <div class="content">
-        <h3>${annotation.title}</h3>
-        <p>${annotation.description}</p>
-      </div>
-    `;
+        <div class="content">
+          <h3>${annotation.title}</h3>
+          <p>${annotation.description}</p>
+        </div>
+      `;
       
-      // Create CSS2D object
       const label = new CSS2DObject(labelDiv);
       label.position.copy(annotation.position);
+      labelRef.current = label;
       markerRef.current.add(label);
 
-      // Add click handler
       labelDiv.addEventListener('click', () => onClick(annotation));
       
       return () => {
@@ -86,6 +99,15 @@ const AnnotationMarker = ({ annotation, onClick }) => {
       };
     }
   }, [annotation, onClick]);
+
+  // Update label scale based on camera distance
+  useFrame(() => {
+    if (labelRef.current && camera) {
+      const distance = camera.position.distanceTo(annotation.position);
+      const scale = Math.max(distance / 10, 1); // Adjust divisor to control scaling
+      labelRef.current.element.style.transform = `scale(${1/scale})`;
+    }
+  });
 
   return <group ref={markerRef} />;
 };
@@ -104,15 +126,20 @@ export function Eye() {
     renderer.domElement.style.pointerEvents = 'none';
     document.body.appendChild(renderer.domElement);
     setLabelRenderer(renderer);
+
+    // Handle window resize
+    const handleResize = () => {
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    };
+    window.addEventListener('resize', handleResize);
   
     return () => {
       document.body.removeChild(renderer.domElement);
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
-  // Handle annotation click
   const handleAnnotationClick = (annotation) => {
-    // Animate camera to look at annotation
     const targetPosition = annotation.lookAt.clone();
     const startPosition = camera.position.clone();
     const duration = 1000;
@@ -133,7 +160,6 @@ export function Eye() {
     animate();
   };
 
-  // Render labels
   useFrame(() => {
     if (labelRenderer) {
       labelRenderer.render(scene, camera);
@@ -153,6 +179,7 @@ export function Eye() {
           key={key}
           annotation={annotation}
           onClick={handleAnnotationClick}
+          camera={camera}
         />
       ))}
     </group>
