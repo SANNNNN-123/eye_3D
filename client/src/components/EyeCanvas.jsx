@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { 
   OrbitControls, 
@@ -8,15 +8,18 @@ import {
 } from '@react-three/drei';
 import { useControls, folder } from 'leva';
 import { Eye } from './Eye';
+import NavigationControls, { annotations } from './Annotations';
+
 
 const EyeCanvas = () => {
+  const eyeRef = useRef();
   const cameraControls = useControls({
     Camera: folder({
       fov: { value: 50, min: 10, max: 100, step: 1 },
       near: { value: 0.1, min: 0.1, max: 10, step: 0.1 },
       far: { value: 1000, min: 100, max: 2000, step: 100 },
       position: {
-        value: { x: -2, y: 5, z: 12 },
+        value: { x: -2, y: 8, z: 13 },
         step: 0.1
       }
     }),
@@ -28,6 +31,16 @@ const EyeCanvas = () => {
       autoRotateSpeed: { value: 2.0, min: 0.1, max: 10, step: 0.1 }
     })
   });
+
+  const handleAnnotationClick = (camera) => {
+    eyeRef.current = camera;
+  };
+
+  const handleAnnotationSelect = (annotation) => {
+    if (eyeRef.current?.handleAnnotationClick) {
+      eyeRef.current.handleAnnotationClick(annotation);
+    }
+  };
 
   return (
     <div className="w-full h-full relative">
@@ -53,6 +66,9 @@ const EyeCanvas = () => {
           enableZoom={cameraControls.enableZoom}
           autoRotate={cameraControls.autoRotate}
           autoRotateSpeed={cameraControls.autoRotateSpeed}
+          maxDistance={14}
+          minDistance={6}
+          target={[0, 0, 0]}
         />
 
         <Grid 
@@ -64,12 +80,18 @@ const EyeCanvas = () => {
         />
         
         <Suspense fallback={null}>
-          <Eye />
+          <Eye 
+            ref={eyeRef}
+            onAnnotationClick={handleAnnotationClick} 
+          />
           <Environment preset="studio" />
         </Suspense>
-
-        {/* Loading overlay */}
       </Canvas>
+      
+      <NavigationControls 
+        onAnnotationSelect={handleAnnotationSelect}
+        onAnnotationFocus={handleAnnotationClick}
+      />
 
       {/* Optional loading indicator */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
