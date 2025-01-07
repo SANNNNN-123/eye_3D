@@ -1,4 +1,4 @@
-import React, { Suspense, useRef } from 'react';
+import React, { Suspense, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { 
   OrbitControls, 
@@ -13,6 +13,7 @@ import NavigationControls, { annotations } from './Annotations';
 
 const EyeCanvas = () => {
   const eyeRef = useRef();
+  const [activeAnnotation, setActiveAnnotation] = useState(null);
   const cameraControls = useControls({
     Camera: folder({
       fov: { value: 50, min: 10, max: 100, step: 1 },
@@ -32,11 +33,13 @@ const EyeCanvas = () => {
     })
   });
 
-  const handleAnnotationClick = (camera) => {
-    eyeRef.current = camera;
+  const handleAnnotationClick = (annotation) => {
+    setActiveAnnotation(annotation);
+    eyeRef.current = annotation;
   };
 
   const handleAnnotationSelect = (annotation) => {
+    setActiveAnnotation(annotation);
     if (eyeRef.current?.handleAnnotationClick) {
       eyeRef.current.handleAnnotationClick(annotation);
     }
@@ -91,6 +94,7 @@ const EyeCanvas = () => {
       <NavigationControls 
         onAnnotationSelect={handleAnnotationSelect}
         onAnnotationFocus={handleAnnotationClick}
+        activeAnnotation={activeAnnotation}
       />
 
       {/* Optional loading indicator */}

@@ -62,9 +62,21 @@ export const annotations = {
     
 };
 
-const NavigationControls = ({ onAnnotationSelect, onAnnotationFocus }) => {
+const NavigationControls = ({ onAnnotationSelect, onAnnotationFocus, activeAnnotation }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const annotationArray = Object.values(annotations).sort((a, b) => a.number - b.number);
+
+    // Update currentIndex when activeAnnotation changes
+    useEffect(() => {
+        if (activeAnnotation) {
+        const newIndex = annotationArray.findIndex(
+            annotation => annotation.number === activeAnnotation.number
+        );
+        if (newIndex !== -1) {
+            setCurrentIndex(newIndex);
+        }
+        }
+    }, [activeAnnotation]);
     
     const navigateAnnotation = (direction) => {
       const newIndex = direction === 'next' 
