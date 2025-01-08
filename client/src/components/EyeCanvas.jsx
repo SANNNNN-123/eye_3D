@@ -1,3 +1,4 @@
+// EyeCanvas.jsx
 import React, { Suspense, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { 
@@ -14,13 +15,15 @@ import NavigationControls, { annotations } from './Annotations';
 const EyeCanvas = () => {
   const eyeRef = useRef();
   const [activeAnnotation, setActiveAnnotation] = useState(null);
+  const [showAnnotations, setShowAnnotations] = useState(true);
+
   const cameraControls = useControls({
     Camera: folder({
-      fov: { value: 50, min: 10, max: 100, step: 1 },
+      fov: { value: 34, min: 10, max: 100, step: 1 },
       near: { value: 0.1, min: 0.1, max: 10, step: 0.1 },
       far: { value: 1000, min: 100, max: 2000, step: 100 },
       position: {
-        value: { x: -2, y: 8, z: 13 },
+        value: { x: -1, y: 7, z: 11 },
         step: 0.1
       }
     }),
@@ -47,6 +50,27 @@ const EyeCanvas = () => {
 
   return (
     <div className="w-full h-full relative">
+      <div className="absolute left-4 top-4 z-50">
+        <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
+          <div className="flex items-center justify-between gap-4">
+            <h3 className="text-white font-medium">Annotations</h3>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input 
+                type="checkbox" 
+                className="sr-only peer"
+                checked={showAnnotations}
+                onChange={(e) => setShowAnnotations(e.target.checked)}
+              />
+              <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer 
+                          peer-checked:after:translate-x-full peer-checked:bg-blue-600
+                          after:content-[''] after:absolute after:top-[2px] after:left-[2px] 
+                          after:bg-white after:rounded-full after:h-5 after:w-5 
+                          after:transition-all">
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
       <Canvas
         shadows
         className="w-full h-full"
@@ -86,6 +110,7 @@ const EyeCanvas = () => {
           <Eye 
             ref={eyeRef}
             onAnnotationClick={handleAnnotationClick} 
+            showAnnotations={showAnnotations}
           />
           <Environment preset="studio" />
         </Suspense>

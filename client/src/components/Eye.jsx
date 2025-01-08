@@ -6,12 +6,12 @@ import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer
 import NavigationControls, { annotations } from './Annotations';
 
 // Annotation Marker Component
-const AnnotationMarker = ({ annotation, onClick, camera, isActive }) => {
+const AnnotationMarker = ({ annotation, onClick, camera, isActive, visible }) => {
   const markerRef = useRef();
   const labelRef = useRef();
   
   useEffect(() => {
-    if (markerRef.current) {
+    if (markerRef.current && visible) {
       const labelDiv = document.createElement('div');
       labelDiv.className = 'annotation-label';
       labelDiv.innerHTML = `
@@ -39,20 +39,25 @@ const AnnotationMarker = ({ annotation, onClick, camera, isActive }) => {
         labelDiv.remove();
       };
     }
-  }, [annotation, onClick, isActive]);
+  }, [annotation, onClick, isActive, visible]);
 
   useFrame(() => {
     if (labelRef.current && camera) {
       const distance = camera.position.distanceTo(annotation.position);
       const scale = Math.max(distance / 10, 1);
       labelRef.current.element.style.transform = `scale(${1/scale})`;
+      
+      // Update visibility
+      if (labelRef.current.element) {
+        labelRef.current.element.style.display = visible ? 'block' : 'none';
+      }
     }
   });
 
   return <group ref={markerRef} />;
 };
 
-export const Eye = forwardRef(({ onAnnotationClick }, ref) => {
+export const Eye = forwardRef(({ onAnnotationClick, showAnnotations = true }, ref) => {
   const groupRef = useRef();
   const { scene, camera, gl } = useThree();
   const { scene: modelScene } = useGLTF('/anatomy_of_the_eye-v1.glb');
@@ -85,6 +90,8 @@ export const Eye = forwardRef(({ onAnnotationClick }, ref) => {
   }, []);
 
   const handleAnnotationClick = (annotation) => {
+    if (!showAnnotations) return; // Prevent interaction when annotations are hidden
+    
     setActiveAnnotation(annotation);
     if (!annotation) return;
 
@@ -133,6 +140,7 @@ export const Eye = forwardRef(({ onAnnotationClick }, ref) => {
           onClick={handleAnnotationClick}
           camera={camera}
           isActive={activeAnnotation?.number === annotation.number}
+          visible={showAnnotations}
         />
       ))}
     </group>
