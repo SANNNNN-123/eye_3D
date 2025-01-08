@@ -10,12 +10,18 @@ import {
 import { useControls, folder } from 'leva';
 import { Eye } from './Eye';
 import NavigationControls, { annotations } from './Annotations';
+import DiseaseControl from './DiseaseControl';
 
 
 const EyeCanvas = () => {
   const eyeRef = useRef();
   const [activeAnnotation, setActiveAnnotation] = useState(null);
   const [showAnnotations, setShowAnnotations] = useState(true);
+  const [activeConditions, setActiveConditions] = useState({
+    glaucoma: false,
+    cataract: false,
+    'diabetic-retinopathy': false
+  });
 
   const cameraControls = useControls({
     Camera: folder({
@@ -48,6 +54,13 @@ const EyeCanvas = () => {
     }
   };
 
+  const handleDiseaseToggle = (diseaseId, isActive) => {
+    setActiveConditions(prev => ({
+      ...prev,
+      [diseaseId]: isActive
+    }));
+  };
+
   return (
     <div className="w-full h-full relative">
       <div className="absolute left-4 top-4 z-50">
@@ -71,6 +84,10 @@ const EyeCanvas = () => {
           </div>
         </div>
       </div>
+
+      <DiseaseControl onToggleDisease={handleDiseaseToggle} />
+
+
       <Canvas
         shadows
         className="w-full h-full"
@@ -120,6 +137,7 @@ const EyeCanvas = () => {
         onAnnotationSelect={handleAnnotationSelect}
         onAnnotationFocus={handleAnnotationClick}
         activeAnnotation={activeAnnotation}
+        activeConditions={activeConditions}
       />
 
       {/* Optional loading indicator */}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import * as THREE from 'three';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 // Define annotations
 export const annotations = {
@@ -104,24 +105,28 @@ const NavigationControls = ({ onAnnotationSelect, onAnnotationFocus, activeAnnot
   
     return (
       <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
-        <div className="flex items-center justify-between bg-gray-900 bg-opacity-100 rounded-lg overflow-hidden shadow-lg w-[300px]">
-          <button 
-            onClick={() => navigateAnnotation('prev')}
-            className="px-4 py-3 hover:bg-gray-700 text-white transition-colors"
-          >
-            ←
-          </button>
-          
-          <div className="px-4 py-3 text-white min-w-[160px] text-center font-medium">
-            {annotationArray[currentIndex]?.title || 'Loading...'}
+        <div className="bg-gray-900 py-2 px-3 rounded-lg shadow-lg">
+          <div className="flex items-center space-x-4">
+            <button 
+              onClick={() => navigateAnnotation('prev')}
+              className="p-1.5 hover:bg-gray-800 rounded-lg transition-colors text-blue-500"
+              aria-label="Previous annotation"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            
+            <div className="px-3 text-white font-medium min-w-[160px] text-center">
+              {annotationArray[currentIndex]?.title || 'Loading...'}
+            </div>
+            
+            <button 
+              onClick={() => navigateAnnotation('next')}
+              className="p-1.5 hover:bg-gray-800 rounded-lg transition-colors text-blue-500"
+              aria-label="Next annotation"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
           </div>
-          
-          <button 
-            onClick={() => navigateAnnotation('next')}
-            className="px-4 py-3 hover:bg-gray-700 text-white transition-colors"
-          >
-            →
-          </button>
         </div>
       </div>
     );
