@@ -11,10 +11,11 @@ node_modules
 dist
 dist-ssr
 *.local
-ShibaInu.gltf
-3d-vh-f-eye-r.glb
-anatomy_of_the_eye.glb
-Donkey.gltf
+
+public/ShibaInu.gltf
+public/3d-vh-f-eye-r.glb
+public/anatomy_of_the_eye.glb
+public/Donkey.gltf
 
 # Editor directories and files
 .vscode/*
