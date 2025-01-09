@@ -1,5 +1,5 @@
 import React from 'react';
-import { Eye, CircleDot, Activity, Droplets, Sun, Triangle, Skull, AlertCircle, Heart, Info } from 'lucide-react';
+import { Eye, CircleDot, Activity, Droplets, Sun, Triangle, AlertCircle, Heart, Info } from 'lucide-react';
 
 const DiseaseControl = ({ onToggleDisease }) => {
   const diseases = [
