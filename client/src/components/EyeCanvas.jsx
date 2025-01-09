@@ -11,7 +11,20 @@ import { useControls, folder } from 'leva';
 import { Eye } from './Eye';
 import NavigationControls, { annotations } from './Annotations';
 import DiseaseControl from './DiseaseControl';
+import { Info } from 'lucide-react';
 
+const Disclaimer = () => (
+  <div className="absolute bottom-4 right-4 z-50">
+    <div className="bg-gray-900 p-3 rounded-lg shadow-lg flex items-center gap-2">
+      <Info className="w-4 h-4 text-blue-400" />
+      <div className="text-xs">
+        <span className="text-gray-400">Made by </span>
+        <span className="text-white font-medium">ZUHAIR</span>
+        <span className="text-gray-400 ml-2">v1.9</span>
+      </div>
+    </div>
+  </div>
+);
 
 const EyeCanvas = () => {
   const eyeRef = useRef();
@@ -20,7 +33,13 @@ const EyeCanvas = () => {
   const [activeConditions, setActiveConditions] = useState({
     glaucoma: false,
     cataract: false,
-    'diabetic-retinopathy': false
+    'diabetic-retinopathy': false,
+    blepharitis: false,
+    conjunctivitis: false,
+    'dry-amd': false,
+    keratoconus: false,
+    floaters: false,
+    'subconj-haems': false
   });
 
   const cameraControls = useControls({
@@ -89,6 +108,7 @@ const EyeCanvas = () => {
 
 
       <Canvas
+        gl={{ antialias: true }} // Enable antialiasing for smoother
         shadows
         className="w-full h-full"
         camera={{
@@ -128,8 +148,10 @@ const EyeCanvas = () => {
             ref={eyeRef}
             onAnnotationClick={handleAnnotationClick} 
             showAnnotations={showAnnotations}
+            activeConditions={activeConditions}
           />
           <Environment preset="studio" />
+          
         </Suspense>
       </Canvas>
       
@@ -150,6 +172,7 @@ const EyeCanvas = () => {
           <></>
         </Suspense>
       </div>
+      <Disclaimer />
     </div>
   );
 };

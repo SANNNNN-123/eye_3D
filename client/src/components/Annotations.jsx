@@ -28,14 +28,14 @@ export const annotations = {
       conjuctiva: {
         title: "Conjuctiva",
         number : 4,
-        description: "Do something",
+        description: "Protects and lubricates the eye",
         position: new THREE.Vector3(1.5, 1.7, 3.5),
         lookAt: new THREE.Vector3(-1.5, 4, 5)
       },
       sclera: {
         title: "Sclera",
         number : 5,
-        description: "Do something",
+        description: "White outer layer of the eye",
         position: new THREE.Vector3(1, 3.50, 2.8),
         lookAt: new THREE.Vector3(-1.5, 5, 5)
       },
@@ -49,19 +49,21 @@ export const annotations = {
       iris: {
         title: "Iris",
         number : 8,
-        description: "Do something",
+        description: "Controls the size of the pupil",
         position: new THREE.Vector3(1.43, 2.6, 3.3),
         lookAt: new THREE.Vector3(-1.5, 4, 5)
       },
       opticnerve: {
         title: "Optic Nerve",
         number : 9,
-        description: "Do something",
+        description: "Transmits visual signals to the brain",
         position: new THREE.Vector3(-0.66, 2.2, 1.6),
         lookAt: new THREE.Vector3(-1, 4, 6)
       }
     
 };
+
+
 
 const NavigationControls = ({ onAnnotationSelect, onAnnotationFocus, activeAnnotation }) => {
     const [currentIndex, setCurrentIndex] = useState(0);

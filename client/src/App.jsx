@@ -1,7 +1,6 @@
 // App.jsx
 import React from 'react'
 import EyeCanvas from './components/EyeCanvas'
-import ModelViewer from './components/ModelViewer';
 
 function App() {
   return (

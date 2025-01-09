@@ -4,6 +4,7 @@ import { useGLTF, Html } from '@react-three/drei';
 import { useThree, useFrame } from '@react-three/fiber';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 import NavigationControls, { annotations } from './Annotations';
+import * as THREE from 'three';
 
 // Annotation Marker Component
 const AnnotationMarker = ({ annotation, onClick, camera, isActive, visible }) => {
@@ -57,12 +58,41 @@ const AnnotationMarker = ({ annotation, onClick, camera, isActive, visible }) =>
   return <group ref={markerRef} />;
 };
 
-export const Eye = forwardRef(({ onAnnotationClick, showAnnotations = true }, ref) => {
+export const Eye = forwardRef(({ onAnnotationClick, showAnnotations = true, activeConditions }, ref) => {
   const groupRef = useRef();
   const { scene, camera, gl } = useThree();
   const { scene: modelScene } = useGLTF('/anatomy_of_the_eye-v1.glb');
   const [labelRenderer, setLabelRenderer] = useState(null);
   const [activeAnnotation, setActiveAnnotation] = useState(null);
+
+  // Add useEffect to handle material changes
+  useEffect(() => {
+    if (modelScene) {
+      modelScene.traverse((node) => {
+        if (node.name === 'Lens_Lens_0') {
+          // Create a new material if cataract is active
+          if (activeConditions?.cataract) {
+            node.material = new THREE.MeshStandardMaterial({
+              color: '#CD853F', //yellowish-brown
+              roughness: 0.7,
+              metalness: 0.3,
+              transparent: true,
+              opacity: 0.8
+            });
+          } else {
+            node.material = new THREE.MeshStandardMaterial({
+              color: '#FFFFFF', // Original color
+              roughness: 0.2,
+              metalness: 0.1,
+              transparent: true,
+              opacity: 0.6
+            });
+          }
+        }
+      });
+    }
+  }, [activeConditions?.cataract, modelScene]);
+
 
   // Expose methods to parent component
   useImperativeHandle(ref, () => ({
