@@ -106,7 +106,7 @@ const NavigationControls = ({ onAnnotationSelect, onAnnotationFocus, activeAnnot
     }, [currentIndex]);
   
     return (
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
+      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
         <div className="bg-gray-900 py-2 px-3 rounded-lg shadow-lg">
           <div className="flex items-center space-x-4">
             <button 

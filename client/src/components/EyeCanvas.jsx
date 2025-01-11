@@ -26,6 +26,17 @@ const Disclaimer = () => (
   </div>
 );
 
+const CameraInstructions = () => (
+  <div className="absolute bottom-4 left-4 z-50">
+    <div className="bg-gray-900 p-3 rounded-lg shadow-lg">
+      <div className="text-xs space-y-1">
+        <div className="text-gray-400"><span className="text-white font-medium">Drag</span> to move camera</div>
+        <div className="text-gray-400"><span className="text-white font-medium">Scroll</span> to zoom in and out</div>
+      </div>
+    </div>
+  </div>
+);
+
 const EyeCanvas = () => {
   const eyeRef = useRef();
   const [activeAnnotation, setActiveAnnotation] = useState(null);
@@ -42,24 +53,24 @@ const EyeCanvas = () => {
     'subconj-haems': false
   });
 
-  const cameraControls = useControls({
-    Camera: folder({
-      fov: { value: 34, min: 10, max: 100, step: 1 },
-      near: { value: 0.1, min: 0.1, max: 10, step: 0.1 },
-      far: { value: 1000, min: 100, max: 2000, step: 100 },
-      position: {
-        value: { x: -1, y: 7, z: 11 },
-        step: 0.1
-      }
-    }),
-    OrbitControls: folder({
-      enableDamping: true,
-      dampingFactor: { value: 0.05, min: 0.01, max: 0.1, step: 0.01 },
-      enableZoom: true,
-      autoRotate: false,
-      autoRotateSpeed: { value: 2.0, min: 0.1, max: 10, step: 0.1 }
-    })
-  });
+  // const cameraControls = useControls({
+  //   Camera: folder({
+  //     fov: { value: 34, min: 10, max: 100, step: 1 },
+  //     near: { value: 0.1, min: 0.1, max: 10, step: 0.1 },
+  //     far: { value: 1000, min: 100, max: 2000, step: 100 },
+  //     position: {
+  //       value: { x: -1, y: 7, z: 11 },
+  //       step: 0.1
+  //     }
+  //   }),
+  //   OrbitControls: folder({
+  //     enableDamping: true,
+  //     dampingFactor: { value: 0.05, min: 0.01, max: 0.1, step: 0.01 },
+  //     enableZoom: true,
+  //     autoRotate: false,
+  //     autoRotateSpeed: { value: 2.0, min: 0.1, max: 10, step: 0.1 }
+  //   })
+  // });
 
   const handleAnnotationClick = (annotation) => {
     setActiveAnnotation(annotation);
@@ -83,7 +94,7 @@ const EyeCanvas = () => {
   return (
     <div className="w-full h-full relative">
       <div className="absolute left-4 top-4 z-50">
-        <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
+        <div className="bg-gray-900 p-3 rounded-lg shadow-lg">
           <div className="flex items-center justify-between gap-4">
             <h3 className="text-white font-medium">Annotations</h3>
             <label className="relative inline-flex items-center cursor-pointer">
@@ -112,24 +123,21 @@ const EyeCanvas = () => {
         shadows
         className="w-full h-full"
         camera={{
-          fov: cameraControls.fov,
-          near: cameraControls.near,
-          far: cameraControls.far,
-          position: [
-            cameraControls.position.x,
-            cameraControls.position.y,
-            cameraControls.position.z
-          ]
+          fov: 34,
+          near: 0.1,
+          far: 1000,
+          position: [-1,7,11]
         }}
       >
+        {/* <color attach="background" args={['#1f2937']} /> */}
         <color attach="background" args={['#1f2937']} />
         
         <OrbitControls
-          enableDamping={cameraControls.enableDamping}
-          dampingFactor={cameraControls.dampingFactor}
-          enableZoom={cameraControls.enableZoom}
-          autoRotate={cameraControls.autoRotate}
-          autoRotateSpeed={cameraControls.autoRotateSpeed}
+          enableDamping={true}
+          dampingFactor={0.05}
+          enableZoom={true}
+          autoRotate={false}
+          autoRotateSpeed={2.0}
           maxDistance={14}
           minDistance={6}
           target={[0, 0, 0]}
@@ -172,6 +180,7 @@ const EyeCanvas = () => {
           <></>
         </Suspense>
       </div>
+      <CameraInstructions />
       <Disclaimer />
     </div>
   );
