@@ -16,7 +16,7 @@ import { Info } from 'lucide-react';
 const Disclaimer = () => (
   <div className="absolute bottom-4 right-4 z-50">
     <div className="bg-gray-900 p-3 rounded-lg shadow-lg flex items-center gap-2">
-      <Info className="w-4 h-4 text-blue-400" />
+      <Info className="w-4 h-4 text-blue-600" />
       <div className="text-xs">
         <span className="text-gray-400">Made by </span>
         <span className="text-white font-medium">ZUHAIR</span>
@@ -30,8 +30,12 @@ const CameraInstructions = () => (
   <div className="absolute bottom-4 left-4 z-50">
     <div className="bg-gray-900 p-3 rounded-lg shadow-lg">
       <div className="text-xs space-y-1">
-        <div className="text-gray-400"><span className="text-white font-medium">Drag</span> to move camera</div>
-        <div className="text-gray-400"><span className="text-white font-medium">Scroll</span> to zoom in and out</div>
+        <div className="text-gray-400 flex items-center gap-1.5">
+          <span className="text-white font-medium">Drag</span>
+           to move camera</div>
+        <div className="text-gray-400 flex items-center gap-1.5">
+          <span className="text-white font-medium">Scroll</span>
+           to zoom in and out</div>
       </div>
     </div>
   </div>
@@ -52,25 +56,6 @@ const EyeCanvas = () => {
     floaters: false,
     'subconj-haems': false
   });
-
-  // const cameraControls = useControls({
-  //   Camera: folder({
-  //     fov: { value: 34, min: 10, max: 100, step: 1 },
-  //     near: { value: 0.1, min: 0.1, max: 10, step: 0.1 },
-  //     far: { value: 1000, min: 100, max: 2000, step: 100 },
-  //     position: {
-  //       value: { x: -1, y: 7, z: 11 },
-  //       step: 0.1
-  //     }
-  //   }),
-  //   OrbitControls: folder({
-  //     enableDamping: true,
-  //     dampingFactor: { value: 0.05, min: 0.01, max: 0.1, step: 0.01 },
-  //     enableZoom: true,
-  //     autoRotate: false,
-  //     autoRotateSpeed: { value: 2.0, min: 0.1, max: 10, step: 0.1 }
-  //   })
-  // });
 
   const handleAnnotationClick = (annotation) => {
     setActiveAnnotation(annotation);
@@ -129,7 +114,7 @@ const EyeCanvas = () => {
           position: [-1,7,11]
         }}
       >
-        {/* <color attach="background" args={['#1f2937']} /> */}
+        
         <color attach="background" args={['#1f2937']} />
         
         <OrbitControls

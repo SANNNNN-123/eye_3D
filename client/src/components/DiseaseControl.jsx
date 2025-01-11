@@ -73,10 +73,10 @@ const DiseaseControl = ({ onToggleDisease }) => {
           {diseases.map((disease) => (
             <div
               key={disease.id}
-              className="flex items-center justify-between bg-gray-800 p-2.5 rounded-lg"
+              className="flex items-center justify-between bg-gray-800 p-2.5 rounded-lg hover:bg-gray-700 transition-colors" // Added hover and transition
             >
               <div className="flex items-center gap-2.5">
-                <disease.icon className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                <disease.icon className="w-4 h-4 text-blue-600 flex-shrink-0" />
                 <div>
                   <div className="text-white text-sm font-medium">
                     {disease.name}

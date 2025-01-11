@@ -111,7 +111,7 @@ const NavigationControls = ({ onAnnotationSelect, onAnnotationFocus, activeAnnot
           <div className="flex items-center space-x-4">
             <button 
               onClick={() => navigateAnnotation('prev')}
-              className="p-1.5 hover:bg-gray-800 rounded-lg transition-colors text-blue-500"
+              className="p-1.5 hover:bg-gray-800 rounded-lg transition-colors text-blue-600"
               aria-label="Previous annotation"
             >
               <ChevronLeft className="w-5 h-5" />
@@ -123,7 +123,7 @@ const NavigationControls = ({ onAnnotationSelect, onAnnotationFocus, activeAnnot
             
             <button 
               onClick={() => navigateAnnotation('next')}
-              className="p-1.5 hover:bg-gray-800 rounded-lg transition-colors text-blue-500"
+              className="p-1.5 hover:bg-gray-800 rounded-lg transition-colors text-blue-600"
               aria-label="Next annotation"
             >
               <ChevronRight className="w-5 h-5" />
