@@ -4,6 +4,7 @@ import { useGLTF, Html } from '@react-three/drei';
 import { useThree, useFrame } from '@react-three/fiber';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 import NavigationControls, { annotations } from './Annotations';
+import PressureArrows from './PressureArrows';
 import * as THREE from 'three';
 
 // Annotation Marker Component
@@ -61,7 +62,7 @@ const AnnotationMarker = ({ annotation, onClick, camera, isActive, visible }) =>
 export const Eye = forwardRef(({ onAnnotationClick, showAnnotations = true, activeConditions }, ref) => {
   const groupRef = useRef();
   const { scene, camera, gl } = useThree();
-  const { scene: modelScene } = useGLTF('/anatomy_of_the_eye-v1.glb');
+  const { scene: modelScene } = useGLTF('/output.glb');
   const [labelRenderer, setLabelRenderer] = useState(null);
   const [activeAnnotation, setActiveAnnotation] = useState(null);
 
@@ -163,6 +164,8 @@ export const Eye = forwardRef(({ onAnnotationClick, showAnnotations = true, acti
         scale={0.1}
       />
       
+      <PressureArrows visible={activeConditions?.glaucoma} />
+      
       {Object.entries(annotations).map(([key, annotation]) => (
         <AnnotationMarker
           key={key}
@@ -177,4 +180,4 @@ export const Eye = forwardRef(({ onAnnotationClick, showAnnotations = true, acti
   );
 });
 
-useGLTF.preload('/anatomy_of_the_eye-v1.glb');
+// useGLTF.preload('/anatomy_of_the_eye-v1.glb');

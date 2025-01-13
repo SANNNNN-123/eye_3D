@@ -67,9 +67,9 @@ const DiseaseControl = ({ showAnnotations, onToggleAnnotations, onToggleDisease 
         {/* Header with toggle */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full p-4 flex items-center justify-between text-white rounded-t-lg"
+          className="w-full p-4 flex items-center justify-between text-white hover:bg-blue-900 rounded-t-lg transition-colors"
         >
-          <span className="font-medium">Eye Disease Controls</span>
+          <span className="font-medium">Opthal Controls</span>
           {isOpen ? (
             <ChevronUp className="w-5 h-5 text-gray-400" />
           ) : (
@@ -104,14 +104,14 @@ const DiseaseControl = ({ showAnnotations, onToggleAnnotations, onToggleDisease 
               [&::-webkit-scrollbar]:w-[6px]
               [&::-webkit-scrollbar-track]:bg-gray-800
               [&::-webkit-scrollbar-track]:rounded-[3px]
-              [&::-webkit-scrollbar-thumb]:bg-gray-600
+              [&::-webkit-scrollbar-thumb]:bg-blue-600
               [&::-webkit-scrollbar-thumb]:rounded-[3px]
-              [&::-webkit-scrollbar-thumb:hover]:bg-gray-500"
+              [&::-webkit-scrollbar-thumb:hover]:bg-blue-500"
             >
               {diseases.map((disease) => (
                 <div
                   key={disease.id}
-                  className="flex items-center justify-between bg-gray-800 p-2.5 rounded-lg hover:bg-gray-700 transition-colors"
+                  className="flex items-center justify-between bg-gray-800 p-2.5 rounded-lg hover:bg-blue-900 transition-colors"
                 >
                   <div className="flex items-center gap-2.5">
                     <disease.icon className="w-4 h-4 text-blue-600 flex-shrink-0" />
