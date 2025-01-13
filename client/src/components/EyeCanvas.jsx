@@ -20,7 +20,7 @@ const Disclaimer = () => (
       <div className="text-xs">
         <span className="text-gray-400">Made by </span>
         <span className="text-white font-medium">ZUHAIR</span>
-        <span className="text-gray-400 ml-2">v1.9</span>
+        <span className="text-gray-400 ml-2">v1.10</span>
       </div>
     </div>
   </div>
@@ -78,33 +78,14 @@ const EyeCanvas = () => {
 
   return (
     <div className="w-full h-full relative">
-      <div className="absolute left-4 top-4 z-50">
-        <div className="bg-gray-900 p-3 rounded-lg shadow-lg">
-          <div className="flex items-center justify-between gap-4">
-            <h3 className="text-white font-medium">Annotations</h3>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input 
-                type="checkbox" 
-                className="sr-only peer"
-                checked={showAnnotations}
-                onChange={(e) => setShowAnnotations(e.target.checked)}
-              />
-              <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer 
-                          peer-checked:after:translate-x-full peer-checked:bg-blue-600
-                          after:content-[''] after:absolute after:top-[2px] after:left-[2px] 
-                          after:bg-white after:rounded-full after:h-5 after:w-5 
-                          after:transition-all">
-              </div>
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <DiseaseControl onToggleDisease={handleDiseaseToggle} />
-
+      <DiseaseControl 
+        showAnnotations={showAnnotations}
+        onToggleAnnotations={setShowAnnotations}
+        onToggleDisease={handleDiseaseToggle}
+      />
 
       <Canvas
-        gl={{ antialias: true }} // Enable antialiasing for smoother
+        gl={{ antialias: true }}
         shadows
         className="w-full h-full"
         camera={{
@@ -114,7 +95,6 @@ const EyeCanvas = () => {
           position: [-1,7,11]
         }}
       >
-        
         <color attach="background" args={['#1f2937']} />
         
         <OrbitControls
@@ -144,7 +124,6 @@ const EyeCanvas = () => {
             activeConditions={activeConditions}
           />
           <Environment preset="studio" />
-          
         </Suspense>
       </Canvas>
       
@@ -155,7 +134,6 @@ const EyeCanvas = () => {
         activeConditions={activeConditions}
       />
 
-      {/* Optional loading indicator */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <Suspense fallback={
           <div className="text-white bg-gray-800 bg-opacity-75 px-4 py-2 rounded-md">
