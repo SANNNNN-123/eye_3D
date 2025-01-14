@@ -4,8 +4,7 @@ import { useGLTF, Html } from '@react-three/drei';
 import { useThree, useFrame } from '@react-three/fiber';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 import NavigationControls, { annotations } from './Annotations';
-import PressureArrows from './PressureArrows';
-import * as THREE from 'three';
+import DiseaseEffects from './DiseaseEffects';
 
 // Annotation Marker Component
 const AnnotationMarker = ({ annotation, onClick, camera, isActive, visible }) => {
@@ -66,35 +65,6 @@ export const Eye = forwardRef(({ onAnnotationClick, showAnnotations = true, acti
   const [labelRenderer, setLabelRenderer] = useState(null);
   const [activeAnnotation, setActiveAnnotation] = useState(null);
 
-  // Add useEffect to handle material changes
-  useEffect(() => {
-    if (modelScene) {
-      modelScene.traverse((node) => {
-        if (node.name === 'Lens_Lens_0') {
-          // Create a new material if cataract is active
-          if (activeConditions?.cataract) {
-            node.material = new THREE.MeshStandardMaterial({
-              color: '#CD853F', //yellowish-brown
-              roughness: 0.7,
-              metalness: 0.3,
-              transparent: true,
-              opacity: 0.8
-            });
-          } else {
-            node.material = new THREE.MeshStandardMaterial({
-              color: '#FFFFFF', // Original color
-              roughness: 0.2,
-              metalness: 0.1,
-              transparent: true,
-              opacity: 0.6
-            });
-          }
-        }
-      });
-    }
-  }, [activeConditions?.cataract, modelScene]);
-
-
   // Expose methods to parent component
   useImperativeHandle(ref, () => ({
     handleAnnotationClick: handleAnnotationClick
@@ -121,7 +91,7 @@ export const Eye = forwardRef(({ onAnnotationClick, showAnnotations = true, acti
   }, []);
 
   const handleAnnotationClick = (annotation) => {
-    if (!showAnnotations) return; // Prevent interaction when annotations are hidden
+    if (!showAnnotations) return;
     
     setActiveAnnotation(annotation);
     if (!annotation) return;
@@ -164,7 +134,10 @@ export const Eye = forwardRef(({ onAnnotationClick, showAnnotations = true, acti
         scale={0.1}
       />
       
-      <PressureArrows visible={activeConditions?.glaucoma} />
+      <DiseaseEffects 
+        modelScene={modelScene}
+        activeConditions={activeConditions}
+      />
       
       {Object.entries(annotations).map(([key, annotation]) => (
         <AnnotationMarker
@@ -179,5 +152,3 @@ export const Eye = forwardRef(({ onAnnotationClick, showAnnotations = true, acti
     </group>
   );
 });
-
-// useGLTF.preload('/anatomy_of_the_eye-v1.glb');

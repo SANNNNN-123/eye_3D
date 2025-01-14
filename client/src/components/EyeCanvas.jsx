@@ -95,8 +95,10 @@ const EyeCanvas = () => {
           position: [-1,7,11]
         }}
       >
-        <color attach="background" args={['#1f2937']} />
+        <color attach="background" args={['#AECDFE']} />
         
+          {/* //1f2937 */}
+
         <OrbitControls
           enableDamping={true}
           dampingFactor={0.05}
@@ -108,13 +110,13 @@ const EyeCanvas = () => {
           target={[0, 0, 0]}
         />
 
-        <Grid 
+        {/* <Grid 
           args={[30, 30]} 
           cellColor="#6b7280"
           sectionColor="#9ca3af"
           fadeDistance={30}
           fadeStrength={1}
-        />
+        /> */}
         
         <Suspense fallback={null}>
           <Eye 
